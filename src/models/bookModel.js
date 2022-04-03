@@ -10,9 +10,9 @@ const bookSchema = new mongoose.Schema({
     category: {type: String,trim:true,required : true,},
     subcategory : {type : String,trim:true,required : true},
     review:{type : Number,default:0},
-    deletedAt : String,
+    deletedAt : String,// applicable only after deletion of the book
     isDeleted : {type : Boolean,default : false},
-    releasedAt :  {type : String,trim:true,default : moment().format('YYYY-MM-DD')}
+    releasedAt :  {type : String,trim:true,required:true} //format (YYYY-MM-DD)
 },
 { timestamps: true, versionKey:false }
 );

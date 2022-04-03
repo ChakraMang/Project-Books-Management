@@ -3,7 +3,8 @@ const ObjectId = require('mongoose').Types.ObjectId
 const reviewModel = require('../models/reviewModel')
 
 const createReview = async function(req,res){
-    try{let bookId = req.params.bookId.trim();
+    try{
+    let bookId = req.params.bookId.trim();
     if(!bookId) return res.status(400).send({status:false,msg:"bookId is not present in the params"})
     if(!ObjectId.isValid(bookId)) return res.status(400).send({status:false,msg:"bookId in params is invalid"})
     let book = await bookModel.findOne({_id:bookId,isDeleted:false})
@@ -22,10 +23,9 @@ const createReview = async function(req,res){
             reviewData.reviewedBy = 'Guest'
         }
     }
-    if(Object.keys(reviewData).includes('reviewedAt')){
-        if(!(/^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/.test(reviewData.reviewedAt.trim()))){
-            return res.status(400).send({status:false,msg:"reviewed Date is not valid"})
-        }
+    if(!reviewData.reviewedAt) return res.status(400).send({status:false,msg:'enter the reviewedAt date of the book'})
+    if(!(/^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/.test(reviewData.reviewedAt.trim()))){
+        return res.status(400).send({status:false,msg:"released Date is not valid"})
     }
     if(!reviewData.rating) return res.status(400).send({status:false,msg:'rating is not present'})
     if(reviewData.rating<1 || reviewData.rating>5) return res.status(400).send({stats:false,msg:'rating must be in the range from 1 to 5'})
@@ -41,7 +41,8 @@ const createReview = async function(req,res){
 }
 
 const updateReview = async function(req,res){
-    try{if(Object.keys(req.body).length == 0) return res.status(400).send({status:false,msg:"enter the details to update the review"})
+    try{
+    if(Object.keys(req.body).length == 0) return res.status(400).send({status:false,msg:"enter the details to update the review"})
     let bookId = req.params.bookId.trim();
     if(!bookId) return res.status(400).send({status:false,msg:"bookId is not present in the params"})
     if(!ObjectId.isValid(bookId)) return res.status(400).send({status:false,msg:"bookId in params is invalid"})
@@ -56,7 +57,7 @@ const updateReview = async function(req,res){
     // Get review details like review, rating, reviewer's name in request body
     let reviewData = req.body
     let reviewCondition = ['rating','review','reviewedBy']
-    for(let i=0;i<Object.keys(reviewData);i++){
+    for(let i=0;i<Object.keys(reviewData).length;i++){
         if(!reviewCondition.includes(Object.keys(reviewData)[i])) return res.status(400).send({status:false,msg:'wrong update details is present'})
         
     }
@@ -79,7 +80,8 @@ const updateReview = async function(req,res){
 
 const deleteReview = async function(req,res){
     
-    try{let reviewId = req.params.reviewId.trim();
+    try{
+    let reviewId = req.params.reviewId.trim();
     if(!reviewId) return res.status(400).send({status:false,msg:"reviewId is not present in the params"})
     if(!ObjectId.isValid(reviewId)) return res.status(400).send({status:false,msg:"reviewId in params is invalid"})
     let review = await reviewModel.findOne({_id:reviewId,isDeleted:false})
@@ -93,7 +95,7 @@ const deleteReview = async function(req,res){
 
     let updated = await reviewModel.findByIdAndUpdate({_id:reviewId,status:false}, {$set:{isDeleted:true}})
     let bookUpdate = await bookModel.findOneAndUpdate({_id:bookId, isDeleted:false}, {$inc: {review : -1}}) 
-    return res.status(200).send({status:false,msg:'success'})
+    return res.status(200).send({status:true,msg:'success'})
 }catch(error){
     return res.status(500).send({status:false,msg:error.message})
 }

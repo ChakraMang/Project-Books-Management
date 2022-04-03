@@ -8,7 +8,7 @@ const auth = require('../auth/auth')
 
 // user api
 router.post('/register',userController.createUser)
-router.post('/loginUser',userController.loginUser)
+router.post('/login',userController.loginUser)
 
 // book api
 router.post('/books',auth.authentication,bookController.createBooks)
