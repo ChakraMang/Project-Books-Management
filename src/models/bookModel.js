@@ -5,6 +5,7 @@ const moment = require('moment')
 const bookSchema = new mongoose.Schema({
     title : {type : String,required :true,unique : true,trim : true},
     excerpt :{type:String,required:true,trim:true},
+    bookCover : {type:String, required:true},
     userId: {type: ObjectId,trim:true,required:true,ref : 'users'},
     ISBN : {type : String,trim:true,required:true,unique:true},
     category: {type: String,trim:true,required : true,},

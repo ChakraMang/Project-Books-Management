@@ -3,6 +3,8 @@ const reviewModel = require('../models/reviewModel');
 const ObjectId = require('mongoose').Types.ObjectId
 const userModel = require('../models/userModel')
 const jwt = require('jsonwebtoken')
+const upload = require('../upload/upload')
+
 
 const createBooks = async function(req,res){
     try{
@@ -53,7 +55,20 @@ const createBooks = async function(req,res){
     if(!(/^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/.test(bookData.releasedAt.trim()))){
         return res.status(400).send({status:false,msg:"released Date is not valid"})
     }
+    let files = req.files
+    if (files && files.length > 0) {
+            //upload to s3 and get the uploaded link
+            // res.send the link back to frontend/postman
+        var uploadedFileURL = await upload.uploadFile(files[0]) // used var to declare uploadedFileURl in global scope
+    }
+    else {
+         res.status(400).send({ msg: "No file found" })
+    }
+    bookData.bookCover = uploadedFileURL;
+
+    
     let data = await bookModel.create(bookData)
+
     return res.status(201).send({status:true,msg:'success',data : data})
 }catch(error){
     return res.status(500).send({status:false,msg:error.message})
